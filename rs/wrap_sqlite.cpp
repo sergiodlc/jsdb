@@ -275,7 +275,7 @@ Stream* BlobToStream(JSContext* cx, sqlite3_blob* blob)
       char z[1024];
       while (length)
       {
-          int c = sqlite3_blob_read(blob, z, min(length,sizeof(z)),start);
+          int c = sqlite3_blob_read(blob, z, min(length,(int) sizeof(z)),start);
           s->write(z, c);
           start += c;
           length -= c;

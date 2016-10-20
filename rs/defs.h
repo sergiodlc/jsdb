@@ -91,8 +91,11 @@
 #define MAX(a,b) ((a)<(b)?(b):(a))
 
 #ifdef XP_UNIX
-#define min(a,b) ((a)<(b)?(a):(b))
-#define max(a,b) ((a)<(b)?(b):(a))
+#include <algorithm>
+using std::min;
+using std::max;
+// #define min(a,b) ((a)<(b)?(a):(b))
+// #define max(a,b) ((a)<(b)?(b):(a))
 #endif
 
 #ifndef XP_WIN

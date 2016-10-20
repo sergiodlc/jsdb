@@ -231,7 +231,7 @@ bool ZipArchive::Extract(size_t i, Stream& out)
   {
    if (bytesin < f->compressedSize)
    {
-    uint32 x = data->read(cin,min(f->compressedSize-bytesin,(uint32)cin.size));
+    uint32 x = data->read(cin,min(f->compressedSize-bytesin,(count_t) cin.size));
     if (x == 0) break;
     bytesin += x;
     zlib.next_in = (Bytef*)cin.buf;

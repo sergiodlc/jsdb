@@ -422,7 +422,7 @@ WRAP(Stream,SetEndOfFile)
  f = TYPESAFE_DOWNCAST(t,MemoryStream);
  if (f)
  {
-  f->Maxsize = min(f->Maxsize,len);
+  f->Maxsize = min(f->Maxsize,(long int) len);
   RETBOOL(true);
  }
   }
@@ -431,7 +431,7 @@ WRAP(Stream,SetEndOfFile)
  f = TYPESAFE_DOWNCAST(t,ByteStream);
  if (f)
  {
-  f->Maxsize = min(f->Maxsize,len);
+  f->Maxsize = min(f->Maxsize,(long int) len);
   RETBOOL(true);
  }
  }

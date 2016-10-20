@@ -31,14 +31,14 @@ size_t TWORMList::Add(const char* x)
  if (!x) x = "";
  size_t l = strlen(x) + 1;
  if (!tail)
-   tail = new TData(0,max(l,4096u));
+   tail = new TData(0,max(l,(size_t) 4096u));
 
  if ((tail->data.size - tail->pos) < l)
  {
   if (tail->pos == 0)
    tail->data.Resize(l);
   else
-   tail = new TData(tail,max(l,4096u));
+   tail = new TData(tail,max(l,(size_t) 4096u));
  }
 
  char * start = tail->data.buf + tail->pos;

@@ -334,7 +334,7 @@ bool DBFHeader::CreateFile(const char * pfname)
        }
        else
        {//that's how we normally do it
-        Field.length             = min(R->FieldLength,255u);
+        Field.length             = min(R->FieldLength,(size_t) 255u);
         Field.decimalcount       = 0;
         Field.OldSwinFieldLength = 0;
        }
