@@ -27,7 +27,7 @@ operator char * () {((char *)Mem)[Maxsize] = 0; return (char*)Mem;}
 void operator = (const char * c) {Clear(); writestr(c);}
 bool operator == (const char * c) {return !strcasecmp((char*)*this,c?c:"");}
 bool operator != (const char * c) {return strcasecmp((char*)*this,c?c:"");}
-bool canwrite() {return true;}
+virtual bool canwrite() {return true;}
 
 };
 

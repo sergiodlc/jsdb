@@ -329,6 +329,10 @@ class ConcatStream : public Stream
 #ifndef NO_MEMORY_STREAM
 #include "rs/io_memory.h"
 
+#ifndef NO_CURL_STREAM
+#include "rs/io_curl.h"
+#endif
+
 #ifndef NO_FILE_STREAM
 #include "rs/io_file.h"
 #endif

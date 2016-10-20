@@ -105,7 +105,7 @@ Stream_Stream(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
    xdb err;
    if (Env->SafeMode)
     {//only web and memory streams are allowed
-     if (strncasecmp(s0,"http://",7) && strncasecmp(s0,"inet://",7) && strncasecmp(s0,"net://",6))
+     if (strncasecmp(s0,"http://",7) && strncasecmp(s0,"https://",8) && strncasecmp(s0,"inet://",7) && strncasecmp(s0,"net://",6))
      {
        if (Env->SafeMode) ERR_MSG(Stream,Stream,"blocked by security settings");
      }
@@ -115,9 +115,66 @@ Stream_Stream(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
    if (*s0 == 0 || !strcasecmp(s0,"stdin") ||
        !strcasecmp(s0,"stdout") || !strcasecmp(s0,"stderr"))
     ERR_MSG(Stream,"Invalid filename",s0);
+  
+   if (!strncasecmp(s0,"http://",7) || !strncasecmp(s0,"https://",8))
+    {//opens HTTPS and reads the reply
+     int header_idx = 1, curl_opts_idx = 2;
+     if (argc >= 2 && ISINT(1))
+     {
+       header_idx = 2;
+       curl_opts_idx = 3;
+       if (INT(1) == 0)
+       {
+         if (!strncasecmp(s0,"http://",7))  // Handle mode 0 http calls through an InternetStream
+            goto HTTP0;
+          ERR_MSG(Stream,Stream,"HTTPS transfers only support mode = 1. For mode 0 try using net:// instead");
+       }
+     }
+     TPointer<TParameterList> sendHeaderAutoDelete;
+     TNameValueList* sendHeader = 0;
+     TPointer<TParameterList> curlOptsAutoDelete;
+     TNameValueList* curlOpts = 0;
+     if (argc > header_idx && JSVAL_IS_OBJECT(argv[header_idx]))
+      {
+       GETREC(header_idx,sendHeader)
+      }
+     if (argc > curl_opts_idx && JSVAL_IS_OBJECT(argv[curl_opts_idx]))
+      {
+       GETREC(curl_opts_idx,curlOpts)
+      }
 
-   if (!strncasecmp(s0,"http://",7))
-    {//opens HTTP and reads the reply
+     try {
+      TStr proxy;
+      GetProxy(proxy,s0);
+
+      CurlStream * is = new CurlStream(TStr(proxy,s0),sendHeader,curlOpts);
+      dt = is; //stream to return
+
+      val = STRING_TO_JSVAL(JS_NewStringCopyZ(cx,is->status_text));
+      JS_SetProperty(cx, obj,"statusText",&val);
+
+      val = INT_TO_JSVAL(is->status);
+      JS_SetProperty(cx, obj,"status",&val);
+
+       if (is->response_headers && !is->response_headers->Has("Content-Length"))
+          is->response_headers->Set("Content-Length", is->size());
+
+      //header is a property
+      if (is->response_headers) {
+        JSObject * h = JS_NewObject(cx, NULL, NULL, NULL);
+        ListToObject(cx, *(is->response_headers),h);
+        jsval val = OBJECT_TO_JSVAL(h);
+        JS_SetProperty(cx, obj,"header",&val);
+      }
+
+      if (dt->error) {delete dt; dt=0;}
+     } catch(...) {dt=0;}
+     //loadStatus = false;
+  }
+  else
+HTTP0:
+  if (!strncasecmp(s0,"http://",7))
+   {//opens HTTP and reads the reply
      TPointer<TParameterList> sendHeaderAutoDelete;
      TNameValueList* sendHeader = 0;
      if (argc >= 3 && JSVAL_IS_OBJECT(argv[2]))
@@ -342,6 +399,7 @@ Stream_JSGet(JSContext *cx, JSObject *obj, jsval id, jsval *rval)
  if (JSVAL_IS_INT(id))
  {
   InternetStream* s = 0;
+  CurlStream *c = 0;
 //#ifdef XP_WIN
   PipeStream* p =0;
 //#endif
@@ -354,6 +412,7 @@ Stream_JSGet(JSContext *cx, JSObject *obj, jsval id, jsval *rval)
    case 4: RETBOOL(t->eof());
    case 5:
    case 6: s = TYPESAFE_DOWNCAST(t,InternetStream);
+           if (!s) c = TYPESAFE_DOWNCAST(t,CurlStream);
            break;
    case 7: RETBOOL(t->canread());
    case 8: RETBOOL(t->canwrite());
@@ -365,8 +424,10 @@ Stream_JSGet(JSContext *cx, JSObject *obj, jsval id, jsval *rval)
   switch(x)
   {
    case 5: if (s) RETSTRWC(s->gethostinfo());
+           if (c) RETSTRWC(c->hostname);
            RETSTRW(L"");
    case 6: if (s) RETINT(s->hostaddr);
+           if (c) RETSTRWC(c->hostaddr);
            RETINT(0);
 //#ifdef XP_WIN
    case 10: if (p && p->StdErr) RETOBJ(Stream_Object(cx,p->StdErr,false,GETPOINTER));

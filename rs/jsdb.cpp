@@ -12,6 +12,10 @@ extern "C" char * readline(char *prompt);
 extern "C" void add_history(char  *line);
 #endif
 
+#ifdef NO_CURL_STREAM
+#include <curl/curl.h>
+#endif // !NO_CURL_STREAM
+
 #include "js/src/jscntxt.h"
 
 // needed for Coinitialize because of WIN32_LEAN_AND_MEAN=1 defined in tracemonkey
@@ -644,6 +648,11 @@ bool runConsole = true;
 const char* execCode = 0;
 int error = 0;
 
+/* Initialize curl */
+#ifdef NO_CURL_STREAM
+curl_global_init(CURL_GLOBAL_ALL);
+#endif // !NO_CURL_STREAM
+
 #ifndef JSDB_MINIMAL
 if (FileExists(argv0))
 {
@@ -882,6 +891,9 @@ else
  }
 
 // Cleanup!
+ #ifdef NO_CURL_STREAM
+ curl_global_cleanup();
+ #endif // !NO_CURL_STREAM
  JS_GC(Env->cx);
  JS_DestroyContext(Env->cx);
  JS_DestroyRuntime(Env->rt);
