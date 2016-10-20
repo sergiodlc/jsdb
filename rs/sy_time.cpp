@@ -13,7 +13,7 @@ extern "C" long GetTickCount()
 }
 #endif
 
-extern const char * months[] =
+const char * months[] =
 {"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 
 void ParseDateTime(char* in, SYSTEMTIME& tm)

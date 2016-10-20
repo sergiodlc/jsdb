@@ -746,7 +746,7 @@ js_NewGenerator(JSContext *cx, JSStackFrame *fp)
     gen->frame.argsobj = fp->argsobj;
     if (fp->argsobj) {
         JSVAL_TO_OBJECT(fp->argsobj)->setPrivate(&gen->frame);
-        fp->argsobj = NULL;
+        fp->argsobj = 0;
     }
 
     /* These two references can be shared with fp until it goes away. */

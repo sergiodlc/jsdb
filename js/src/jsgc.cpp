@@ -355,7 +355,7 @@ JS_STATIC_ASSERT(offsetof(JSGCArenaInfo, u) == 3 * sizeof(jsuword));
  * Macros to convert between JSGCArenaInfo, the start address of the arena and
  * arena's page defined as (start address) >> GC_ARENA_SHIFT.
  */
-#define ARENA_INFO_OFFSET (GC_ARENA_SIZE - (uint32) sizeof(JSGCArenaInfo))
+#define ARENA_INFO_OFFSET (GC_ARENA_SIZE - (uintptr_t) sizeof(JSGCArenaInfo))
 
 #define IS_ARENA_INFO_ADDRESS(arena)                                          \
     (((jsuword) (arena) & GC_ARENA_MASK) == ARENA_INFO_OFFSET)

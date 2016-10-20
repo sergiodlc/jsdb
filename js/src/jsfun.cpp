@@ -369,7 +369,7 @@ WrapEscapingClosure(JSContext *cx, JSStackFrame *fp, JSObject *funobj, JSFunctio
     wfun->u.i.skipmin = fun->u.i.skipmin;
     wfun->u.i.wrapper = true;
     wfun->u.i.script = NULL;
-    wfun->u.i.names.taggedAtom = NULL;
+    wfun->u.i.names.taggedAtom = 0;
     wfun->atom = fun->atom;
 
     if (fun->hasLocalNames()) {

@@ -4536,7 +4536,7 @@ js_SetPropertyHelper(JSContext *cx, JSObject *obj, jsid id, JSBool cacheResult,
     }
 
     if (!js_NativeSet(cx, obj, sprop, vp))
-        return NULL;
+        return JS_FALSE;
 
     JS_UNLOCK_SCOPE(cx, scope);
     return JS_TRUE;

@@ -2094,7 +2094,7 @@
                     newifp = (JSInlineFrame *) newsp;
                     newsp += nframeslots;
                     newifp->frame.callobj = NULL;
-                    newifp->frame.argsobj = NULL;
+                    newifp->frame.argsobj = 0;
                     newifp->frame.varobj = NULL;
                     newifp->frame.script = script;
                     newifp->frame.fun = fun;

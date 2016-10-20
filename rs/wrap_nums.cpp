@@ -353,7 +353,7 @@ JSBool Num_JSResolve(JSContext *cx, JSObject *obj, jsval id,
 
   if (!JSVAL_IS_INT(id)) return JS_ResolveStub(cx,obj,id);
 
-  int32 x = JSVAL_TO_INT(id);
+  long x = JSVAL_TO_INT(id);
 
   if (flags & JSRESOLVE_ASSIGNING) //Num_Set will expand if necessary
   {

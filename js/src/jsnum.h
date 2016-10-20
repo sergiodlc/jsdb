@@ -48,6 +48,10 @@
 #include <ieeefp.h>
 #endif
 
+#if __APPLE__
+#define finite(x) isfinite(x)
+#endif
+
 /*
  * JS number (IEEE double) interface.
  *

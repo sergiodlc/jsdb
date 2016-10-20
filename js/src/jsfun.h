@@ -230,7 +230,7 @@ js_GetArgsPrivateNative(JSObject *argsobj)
 {
     JS_ASSERT(STOBJ_GET_CLASS(argsobj) == &js_ArgumentsClass);
     uintptr_t p = (uintptr_t) argsobj->getPrivate();
-    return (js_ArgsPrivateNative *) (p & 2 ? p & ~2 : NULL);
+    return (js_ArgsPrivateNative *) (p & 2 ? p & ~2 : ((uintptr_t) 0));
 }
 #endif
 

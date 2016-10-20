@@ -1478,7 +1478,7 @@ JSCompiler::compileFunctionBody(JSContext *cx, JSFunction *fun, JSPrincipals *pr
     funcg.flags |= TCF_IN_FUNCTION;
     funcg.fun = fun;
     if (!GenerateBlockId(&funcg, funcg.bodyid))
-        return NULL;
+        return false;
 
     /* FIXME: make Function format the source for a function definition. */
     jsc.tokenStream.tokens[0].type = TOK_NAME;
@@ -4317,7 +4317,7 @@ RebindLets(JSParseNode *pn, JSTreeContext *tc)
                 if (!ale) {
                     ale = MakePlaceholder(pn, tc);
                     if (!ale)
-                        return NULL;
+                        return false;
 
                     JSDefinition *dn = ALE_DEFN(ale);
                     dn->pn_type = TOK_NAME;

@@ -5332,7 +5332,7 @@ SynthesizeFrame(JSContext* cx, const FrameInfo& fi, JSObject* callee)
     newsp += nframeslots;
 
     newifp->frame.callobj = NULL;
-    newifp->frame.argsobj = NULL;
+    newifp->frame.argsobj = 0;
     newifp->frame.varobj = NULL;
     newifp->frame.script = script;
     newifp->frame.fun = fun;
@@ -5435,7 +5435,7 @@ SynthesizeSlowNativeFrame(InterpState& state, JSContext *cx, VMSideExit *exit)
     fp->imacpc = NULL;
     fp->slots = NULL;
     fp->callobj = NULL;
-    fp->argsobj = NULL;
+    fp->argsobj = 0;
     fp->varobj = cx->fp->varobj;
     fp->script = NULL;
     // fp->thisp is really a jsval, so reinterpret_cast here, not JSVAL_TO_OBJECT.
@@ -6762,7 +6762,7 @@ js_MonitorLoopEdge(JSContext* cx, uintN& inlineCallCount)
     bool rv;
     switch (lr->exitType) {
       case UNSTABLE_LOOP_EXIT:
-          rv = AttemptToStabilizeTree(cx, globalObj, lr, NULL, NULL);
+          rv = AttemptToStabilizeTree(cx, globalObj, lr, NULL, 0);
 #ifdef MOZ_TRACEVIS
           if (!rv)
               tvso.r = R_FAIL_STABILIZE;
@@ -10392,7 +10392,7 @@ TraceRecorder::callNative(uintN argc, JSOp mode)
                 ARGSIZE_I << (2*ARGSIZE_SHIFT) |
                 ARGSIZE_P << (3*ARGSIZE_SHIFT);
     } else {
-        int32_t offset = (vplen - 1) * sizeof(jsval);
+        intptr_t offset = (vplen - 1) * sizeof(jsval);
         native_rval_ins = lir->ins2(LIR_piadd, invokevp_ins, INS_CONSTWORD(offset));
         args[0] = native_rval_ins;
         args[1] = lir->ins2(LIR_piadd, invokevp_ins, INS_CONSTWORD(2 * sizeof(jsval)));

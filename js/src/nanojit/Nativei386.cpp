@@ -51,6 +51,29 @@
 #include <stdlib.h>
 #endif
 
+#ifdef __x86_64__
+#undef LEAmi4
+#define LEAmi4(a,b,c)
+
+#undef LDi
+#define LDi(a,b)
+
+#undef LDSDm
+#define LDSDm(r,k)
+
+#undef SSE_XORPDr
+#define SSE_XORPDr(r,s)
+
+#undef SSE_XORPD
+#define SSE_XORPD(r,s)
+
+#undef SSE_ADDSDm
+#define SSE_ADDSDm(r,s)
+
+#undef CALL
+#define CALL(call)
+#endif
+
 namespace nanojit
 {
     #if defined FEATURE_NANOJIT && defined NANOJIT_IA32

@@ -1075,6 +1075,9 @@ namespace nanojit
                 case LIR_qaddp:
                 case LIR_qxor:
                 {
+#ifdef __x86_64__
+#define asm_qbinop(ins) asm_arith(ins)
+#endif
                     asm_qbinop(ins);
                     break;
                 }

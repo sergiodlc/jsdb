@@ -22,6 +22,10 @@
 #include <netdb.h>
 #include <sys/time.h>
 #include <netinet/tcp.h>
+#include <poll.h>
+#ifndef POLLRDHUP
+#define POLLRDHUP 0x2000
+#endif
 #define INVALID_SOCKET 0xFFFFFFFF
 #define SOCKET_ERROR -1
 //#define AF_INET PF_INET
@@ -513,6 +517,41 @@ int InternetStream::write(const char *b, int n)
  return ret;
 }
 
+#ifdef XP_UNIX
+bool InternetStream::wait(int ms)
+{
+	struct pollfd fds[1];
+	int rv;
+	char b;
+
+    if (Type == NotOpen) 
+        return false;
+        
+    fds[0].fd = s;
+    fds[0].events = POLLIN | POLLRDHUP;
+    fds[0].revents = 0;
+
+    // Use poll since select() breaks when s>=1024
+    rv = poll(fds,1,ms);
+
+    if (rv > 0 && (fds[0].revents & POLLIN)) {
+        // poll(), like select(), has spurious readiness notifications
+        rv = ::recv(s,&b,1,MSG_DONTWAIT | MSG_PEEK);
+        if (rv > 0)
+            return true; // Data is ready
+        if (rv == 0 || errno == EAGAIN || errno == EWOULDBLOCK)
+            return false; // Spurious notification
+        // rv < 0 fall through
+    }
+
+    if (rv < 0 || (fds[0].revents & POLLRDHUP))
+        Type = NotOpen; // Hard error or remote end closed
+
+    return false;
+}
+#endif
+
+#ifdef XP_WIN
 bool InternetStream::wait(int ms)
 {
  if (Type == NotOpen) return false;
@@ -538,6 +577,7 @@ FD_ZERO(&error);
 
   return FD_ISSET(s,&incoming);
 }
+#endif
 
 bool InternetStream::canread()
 {

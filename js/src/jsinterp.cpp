@@ -1280,7 +1280,7 @@ have_fun:
     frame.thisp = (JSObject *)vp[1];
     frame.varobj = NULL;
     frame.callobj = NULL;
-    frame.argsobj = NULL;
+    frame.argsobj = 0;
     frame.script = script;
     frame.fun = fun;
     frame.argc = argc;
@@ -1523,7 +1523,7 @@ js_Execute(JSContext *cx, JSObject *chain, JSScript *script,
         JS_ASSERT(script->nfixed == 0);
     } else {
         frame.callobj = NULL;
-        frame.argsobj = NULL;
+        frame.argsobj = 0;
         obj = chain;
         if (cx->options & JSOPTION_VAROBJFIX) {
             while ((tmp = OBJ_GET_PARENT(cx, obj)) != NULL)

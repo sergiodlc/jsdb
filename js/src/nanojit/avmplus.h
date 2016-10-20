@@ -75,6 +75,10 @@
 #define NO_FASTCALL
 #endif
 
+#ifdef __x86_64__
+#define SIMULATE_FASTCALL(lr, state_ptr, frag_ptr, func_addr)   \
+    lr = func_addr(state_ptr,frag_ptr)
+#else
 #if defined(NO_FASTCALL)
 #if defined(AVMPLUS_IA32)
 #define SIMULATE_FASTCALL(lr, state_ptr, frag_ptr, func_addr)   \
@@ -86,6 +90,7 @@
     );
 #endif /* defined(AVMPLUS_IA32) */
 #endif /* defined(NO_FASTCALL) */
+#endif
 
 #ifdef WIN32
 #include <windows.h>

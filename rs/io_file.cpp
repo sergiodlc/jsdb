@@ -220,6 +220,7 @@ else
 //  if (textmode) strcat(flags,"t"); else strcat(flags,"b");
 // printf("fopen %s %s\n",filename,flags);
 //  File = fopen(filename,flags);
+IsText=textmode;
     File = open(filename,flags,mode);
      if (File == -1)
         {

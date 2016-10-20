@@ -37,6 +37,9 @@ int main(int argc, char** argv)
   printf("#ifdef XP_MACOSX\n");
   printf("#define HAVE_VA_LIST_AS_ARRAY 1\n");
   printf("#endif\n");
+  printf("#ifdef __x86_64__ \n");
+  printf("#define HAVE_VA_LIST_AS_ARRAY 1\n");
+  printf("#endif\n");
 #endif
 #ifdef __sun__
 /* in js/src/jsstdint.h, insert:

@@ -36,7 +36,7 @@ class PDFWriter
  objid * GetObject(int32 id);
 
  int32 NewPage(int32 width, int32 height);
- void InsertGraphics(Stream& s,int32 len=LONG_MAX);
+ void InsertGraphics(Stream& s,int32 len=0x7FFFFFFF);
   //be sure to rewind the input stream
   
  void write(const char * text);

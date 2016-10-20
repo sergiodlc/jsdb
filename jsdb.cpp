@@ -553,8 +553,28 @@ int main(int argc, char **argv)
  TPointer<JSDBEnvironment> Env(new JSDBEnvironment(&Tables));
  Env->reportWarnings = false;
  Env->shouldStop = false;
+/*
+ const int minbytes = 8L * 1024L * 1024L;
+ int maxbytes = minbytes;
+ char mbmul = 'B';
+ char *mbstr = NULL;
 
- Env->rt = JS_NewRuntime(8L * 1024L * 1024L);
+ mbstr = getenv("JSDB_MAXBYTES");
+ if (mbstr != NULL) {
+     sscanf(mbstr,"%d%c",&maxbytes,mbmul);
+     if (maxbytes < 0)
+         maxbytes = 0;
+     if (mbmul = 'M')
+         maxbytes *= 1000000;
+     else
+     if (mbmul = 'K')
+         maxbytes *= 1000;
+ }
+ if (maxbytes < minbytes)
+     maxbytes = minbytes;
+*/
+ 
+ Env->rt = JS_NewRuntime(200L * 1024L * 1024L/*maxbytes*/);
 
  if (!Env->rt)
   {
@@ -615,8 +635,8 @@ int main(int argc, char **argv)
  #ifdef JSOPTION_XML
  JS_SetOptions(Env->cx,JS_GetOptions(Env->cx) | JSOPTION_XML);
  #endif
- #ifdef JSOPTION_JIT
- JS_SetOptions(Env->cx,JS_GetOptions(Env->cx) | JSOPTION_JIT);
+ #ifdef JSOPTION_JIT // Default is nojit
+// JS_SetOptions(Env->cx,JS_GetOptions(Env->cx) | JSOPTION_JIT);
  #endif
 
  {
