@@ -4,6 +4,10 @@
 #ifndef NO_CURL_STREAM
 #include "io_curl.h"
 
+#if (LIBCURL_VERSION_MAJOR*100+LIBCURL_VERSION_MINOR) < 719
+#define CURLINFO_PRIMARY_IP (CURLINFO) (CURLINFO_STRING + 32)
+#endif
+
 CurlStream::CurlStream() : curl(NULL), response_headers(NULL)
 {
 }
@@ -65,7 +69,7 @@ CurlStream::CurlStream(const char *url, TNameValueList *headers, TNameValueList 
 
         CURLcode res = curl_easy_perform(curl);
         if(res != CURLE_OK) {
-            error = new xdb("curl_easy_perform() failed", "message", curl_easy_strerror(res));
+            error = new xdb("curl_easy_perform() failed", curl_easy_strerror(res));
             status_text = "";
             status = 0;
             if (response_headers) {
@@ -144,3 +148,4 @@ size_t CurlStream::OnData(void *data, size_t size, size_t nmemb, void *_this)
 }
 
 #endif
+

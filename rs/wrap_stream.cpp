@@ -167,7 +167,15 @@ Stream_Stream(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
         JS_SetProperty(cx, obj,"header",&val);
       }
 
-      if (dt->error) {delete dt; dt=0;}
+      if (dt->error) {
+        if (!strncasecmp(s0, "http://", 7)) {  // If it's an HTTP stream, it might still be salvageable
+          delete dt;
+          dt=0;
+          goto HTTP0;
+        } else {
+          ERR_XDB(Stream, (*dt->error));
+        }
+      }
      } catch(...) {dt=0;}
      //loadStatus = false;
   }
