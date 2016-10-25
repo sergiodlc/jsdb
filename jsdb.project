@@ -30,7 +30,7 @@
 		<compile input='.cpp' output='.o' name=g++ path=g++ parameters="$options -o$intermediate$output $input; echo $input;">
 			<template name=include>-idirafter $value </template>
 	  		<template name=define>-D $value </template>
-			<options>-c -fexceptions -I . $include $define -Wno-invalid-offsetof</options>
+			<options>-std=c++98 -c -fexceptions -I . $include $define -Wno-invalid-offsetof</options>
 			<options mode=debug> -g </options>
 		</compile>
 		<link name=g++ resolve=1 path=g++ parameters="$options -o $output $input $libraries $deffile " >
@@ -52,7 +52,7 @@
 		<compile input='.cpp' output='.o' name=g++ path=g++ parameters="$options -o$intermediate$output $input; echo $input;">
 			<template name=include>-idirafter $value </template>
 	  		<template name=define>-D $value </template>
-			<options>-m32 -c -fexceptions -I . $include $define -Wno-invalid-offsetof</options>
+			<options>-m32 -std=c++98 -c -fexceptions -I . $include $define -Wno-invalid-offsetof</options>
 			<options mode=debug> -g </options>
 		</compile>
 		<link mode=release name=g++ resolve=1 path=g++ parameters="$options -o $output $input $libraries $deffile" >
@@ -202,38 +202,42 @@
 		<group>SpiderMonkey</group>
 		<group>SQLite</group>
 	</target>
-	<target platform=linux name="linux" output="jsdb" libraries="m;odbc;pthread" intermediate="obj/">
+	<target platform=linux name="linux" output="jsdb" libraries="m;odbc;pthread;curl" intermediate="obj/">
 		<group>main</group>
 		<group>Wrappers</group>
 		<group>Raosoft</group>
+		<group>Curl</group>
 		<group>ZLib</group>
 		<group>SpiderMonkey</group>
 		<group>editline</group>
 		<group>SQLite</group>
 	</target>
-	<target platform=linux name="linuxiodbc" output="jsdb" libraries="m;iodbc;pthread" intermediate="obj/">
+	<target platform=linux name="linuxiodbc" output="jsdb" libraries="m;iodbc;pthread;curl" intermediate="obj/">
 		<group>main</group>
 		<group>Wrappers</group>
 		<group>Raosoft</group>
+		<group>Curl</group>
 		<group>ZLib</group>
 		<group>SpiderMonkey</group>
 		<group>editline</group>
 		<group>SQLite</group>
 	</target>
-	<target platform=linux name="linuxnosql" output="jsdb" libraries="m;pthread" intermediate="obj/">
+	<target platform=linux name="linuxnosql" output="jsdb" libraries="m;pthread;curl" intermediate="obj/">
 		<define>TBL_NO_SQL</define>
 		<group>main</group>
 		<group>Wrappers</group>
 		<group>Raosoft</group>
+		<group>Curl</group>
 		<group>ZLib</group>
 		<group>SpiderMonkey</group>
 		<group>editline</group>
 		<group>SQLite</group>
 	</target>
-	<target platform=osx name="osx" output="jsdb" options="-mmacosx-version-min=10.4" libraries="m;iodbc;pthread" intermediate="obj/">
+	<target platform=osx name="osx" output="jsdb" options="-mmacosx-version-min=10.4" libraries="m;iodbc;pthread;curl" intermediate="obj/">
 		<group>osxmain</group>
 		<group>Wrappers</group>
 		<group>Raosoft</group>
+		<group>Curl</group>
 		<group>ZLib</group>
 		<group>SpiderMonkey</group>
 		<group>editline</group>
@@ -441,5 +445,8 @@
 		<file>tbl_index.cpp</file>
 		<file>tbl_main.cpp</file>
 		<file>tbl_sql.cpp</file>
+	</group>
+	<group name="Curl" path="rs/" >
+		<file>io_curl.cpp</file>
 	</group>
 </project>

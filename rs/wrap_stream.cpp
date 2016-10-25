@@ -115,7 +115,7 @@ Stream_Stream(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
    if (*s0 == 0 || !strcasecmp(s0,"stdin") ||
        !strcasecmp(s0,"stdout") || !strcasecmp(s0,"stderr"))
     ERR_MSG(Stream,"Invalid filename",s0);
-  
+#ifndef NO_CURL_STREAM
    if (!strncasecmp(s0,"http://",7) || !strncasecmp(s0,"https://",8))
     {//opens HTTPS and reads the reply
      int header_idx = 1, curl_opts_idx = 2;
@@ -180,6 +180,7 @@ Stream_Stream(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
      //loadStatus = false;
   }
   else
+#endif // NO_CURL_STREAM
 HTTP0:
   if (!strncasecmp(s0,"http://",7))
    {//opens HTTP and reads the reply
@@ -407,7 +408,9 @@ Stream_JSGet(JSContext *cx, JSObject *obj, jsval id, jsval *rval)
  if (JSVAL_IS_INT(id))
  {
   InternetStream* s = 0;
+#ifndef NO_CURL_STREAM
   CurlStream *c = 0;
+#endif
 //#ifdef XP_WIN
   PipeStream* p =0;
 //#endif
@@ -420,7 +423,9 @@ Stream_JSGet(JSContext *cx, JSObject *obj, jsval id, jsval *rval)
    case 4: RETBOOL(t->eof());
    case 5:
    case 6: s = TYPESAFE_DOWNCAST(t,InternetStream);
+#ifndef NO_CURL_STREAM
            if (!s) c = TYPESAFE_DOWNCAST(t,CurlStream);
+#endif
            break;
    case 7: RETBOOL(t->canread());
    case 8: RETBOOL(t->canwrite());
@@ -432,10 +437,14 @@ Stream_JSGet(JSContext *cx, JSObject *obj, jsval id, jsval *rval)
   switch(x)
   {
    case 5: if (s) RETSTRWC(s->gethostinfo());
+#ifndef NO_CURL_STREAM
            if (c) RETSTRWC(c->hostname);
+#endif
            RETSTRW(L"");
    case 6: if (s) RETINT(s->hostaddr);
+#ifndef NO_CURL_STREAM
            if (c) RETSTRWC(c->hostaddr);
+#endif
            RETINT(0);
 //#ifdef XP_WIN
    case 10: if (p && p->StdErr) RETOBJ(Stream_Object(cx,p->StdErr,false,GETPOINTER));
