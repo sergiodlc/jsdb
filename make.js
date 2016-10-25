@@ -4,7 +4,7 @@ var doBuild = true; // true = build the program
                     // false = write a build script
 var linkOnly = false; // true = don't compile, just link and post-process
                       // false = compile and build
-var quiet = false;  
+var quiet = false;
 var verbose = false; // not a command line option
 var stopEarly = false;
 var globalDefines = [];
@@ -35,10 +35,10 @@ runMake
 
 function objMatches(a,platform,mode)
 {
-  //var ret = ((!a.get('platform') || a.get('platform') == (platform?platform.get('name'):'')) && 
+  //var ret = ((!a.get('platform') || a.get('platform') == (platform?platform.get('name'):'')) &&
   //        (!a.get('mode') || a.get('mode') == (mode?mode.get('name'):'')));
 
-  return ((!a.get('platform') || a.get('platform').split(',').indexOf(platform?platform.get('name'):'')!= -1) && 
+  return ((!a.get('platform') || a.get('platform').split(',').indexOf(platform?platform.get('name'):'')!= -1) &&
           (!a.get('mode') || a.get('mode').split(',').indexOf(mode?mode.get('name'):'')!= -1));
   /*
   if (platform && a.get('platform'))
@@ -70,9 +70,9 @@ function getProperty(name,define,node,platform,mode)
    var d = [];
    var l = node.find(name);
    for (var i=0; i<l.length; i++)
-   { 
+   {
        var n = l[i]
-       if (n.get('require') && define.indexOf(n.get('require'))==-1) continue;  
+       if (n.get('require') && define.indexOf(n.get('require'))==-1) continue;
        if (objMatches(n,platform,mode))
          d.push(n.cdata);
    }
@@ -85,17 +85,17 @@ function getAttribute(name,node)
    if (l) return l;
    return '';
 }
-     
+
 //BCC Error E2285 rs/tbl_main.cpp 78: Message
 //gcc filename:error:line: description
 function scanErrors(msgs,errors)
 {
  var l;
  while(l=msgs.readln())
- {  
+ {
   if (l.indexOf("Error") == 0) //Borland C++
    return false;
-  
+
   if (l.indexOf('error:') != -1) //gcc
    return false;
 
@@ -104,13 +104,13 @@ function scanErrors(msgs,errors)
 
   if ((l.indexOf('g++.exe') == 0 || l.indexOf('gcc.exe:') == 0) && l.indexOf('warning:') == -1) //gcc
    return false;
-  
+
   //skip "in file included from ..." notes before warnings.
   if (l.search(/^[\w/]+\:\d+\:/) >= 0 && l.indexOf("warning") != -1) //gcc
    return false;
-  
+
   if (l.indexOf("(.text") >= 0) //gcc link
-   return false;  
+   return false;
  }
  return true;
 }
@@ -137,7 +137,7 @@ function runCommand(cmd,errors)
     return true;
    }
    var msgs = new Stream;
-   var out 
+   var out
    if (cmd.indexOf('>') != -1)
    {
      var append = cmd.indexOf('>>') != -1;
@@ -145,7 +145,7 @@ function runCommand(cmd,errors)
      out = new Stream(cmd[1].replace(/^\s+/,''),append ? 'at' : 'wt')
      cmd = cmd[0].replace(/^\.\//,'').replace(/\s+$/,'')
    }
-   var pc = new Stream('exec://'+cmd);  
+   var pc = new Stream('exec://'+cmd);
    var se = pc.stderr;
    while (pc.canRead || pc.canWrite)
      {
@@ -180,7 +180,7 @@ function runCommand(cmd,errors)
 
 function templateize(template,array)
 {
- var ret = []; 
+ var ret = [];
  array.forEach(function(x) {if (x) ret.push(template.replace(/\$value/g,x));})
  return ret;
 }
@@ -201,7 +201,7 @@ function compileFile(cmds,compiler,target,platform,mode,group,file,run)
       define = define.concat(getProperty('define',define,compiler,platform,mode));
 
   if (file.get('require') && define.indexOf(file.get('require'))==-1) return null;
-  
+
   var include = [] //group.get('path');
       //if (include) include += ';';
       include = include.concat(getAttribute('include',mode).split(';'));
@@ -209,47 +209,47 @@ function compileFile(cmds,compiler,target,platform,mode,group,file,run)
       include = include.concat(getAttribute('include',group).split(';'));
       include = include.concat(getAttribute('include',file).split(';'));
       include = include.map(function(x) fixPath(x,platform,mode));
-         
+
   var cmd = fixPath(compiler.get('path'),platform,mode);
   var params = compiler.get('parameters');
-  var infile = fixPath(group.get('path'),platform,mode) + file.cdata;  
+  var infile = fixPath(group.get('path'),platform,mode) + file.cdata;
   var outfile = escapeIntermediate(file.cdata,compiler)
  //might need this for VC.
 // var outfile = file.cdata.replace(/\.\w*$/,compiler.get('output'));
-  
+
   var options = [getAttribute('options',file)];
   options = options.concat(getProperty('options',define,compiler,platform,mode));
-      
+
   var templates = compiler.find('template','name','define');
   if (templates.length)
   {
     define = templateize(templates[0].cdata,define).join(' ')
   }
-  
+
   templates = compiler.find('template','name','include');
   if (templates.length)
   {
     include = templateize(templates[0].cdata,include).join(' ')
-  }  
-  
+  }
+
   params = params.replace(/\$input/g,infile);
   params = params.replace(/\$output/g,outfile);
   params = params.replace(/\$options/g,options.join(' '));
   params = params.replace(/\$define/g,define);
   params = params.replace(/\$include/g,include);
   params = params.replace(/\$intermediate/g,target.get('intermediate'));
-  
+
   if (run)
   {
     if (doBuild)
-    { 
+    {
         writeln(file.cdata);
-       if (!runCommand(cmd + ' ' + params,cmds)) 
-          throw(file.cdata); //+'\r\n'+cmd+' '+params);   
+       if (!runCommand(cmd + ' ' + params,cmds))
+          throw(file.cdata); //+'\r\n'+cmd+' '+params);
     }
     else
     {
-     cmds.writeln(cmd + ' ' + params);  
+     cmds.writeln(cmd + ' ' + params);
     }
   }
   return outfile;
@@ -261,7 +261,7 @@ function fixPath(path,platform,mode)
  {
    var replacements = filter(project.find('path'),platform,mode);
    if (replacements)
-      for (var i=0;i<replacements.length; i++) 
+      for (var i=0;i<replacements.length; i++)
       {
        var r = new RegExp(replacements[i].get('name'),'g')
        path = path.replace(r,replacements[i].cdata);
@@ -282,28 +282,28 @@ function evaluateMacro(obj,platform,mode)
     return macro[0].cdata.replace(/\$\w+/g, function(n) {return obj.get(n.substr(1))})
   }
   else
-    return obj.cdata  
+    return obj.cdata
 }
 
 function doConfigure(commands,configure,platform,mode)
 {
- try 
+ try
  {
   for (var i in configure)
   {
-    if (objMatches(configure[i],platform,mode)) 
+    if (objMatches(configure[i],platform,mode))
     {
       var cmd = evaluateMacro(configure[i],platform,mode) //configure[i].cdata;
       if (doBuild)
-      { 
+      {
         writeln(cmd);
-        if (!runCommand(cmd,commands)) 
+        if (!runCommand(cmd,commands))
            throw(cmd); //+'\r\n'+cmd+' '+params);
       }
       else
       {
-        commands.writeln(cmd);  
-      }    
+        commands.writeln(cmd);
+      }
     }
   }
  } catch(err)
@@ -317,9 +317,9 @@ function doConfigure(commands,configure,platform,mode)
 function doCompile(cmds,project,target,platform,mode,filters)
 {
   var defaultCompiler = platform.find('compile')[0];
-  
+
   var objFiles = [];
-  
+
   var gnames = target.find('group');
   var groups = [target]; //include top-level <file> tags
   var i, j, files, filename, type, compiler;
@@ -331,7 +331,7 @@ function doCompile(cmds,project,target,platform,mode,filters)
    else
      groups = groups.concat(project.find('group','name',gnames[i].cdata));
   }
-  
+
   for (i in groups)
   {
     if (objMatches(groups[i],platform,mode))
@@ -341,7 +341,7 @@ function doCompile(cmds,project,target,platform,mode,filters)
       {
         filename = files[j].cdata;
         var run = false;
-        
+
         if (filters.length)
         {
          for each(f in filters)
@@ -365,25 +365,25 @@ function doCompile(cmds,project,target,platform,mode,filters)
           type = filename.substr(filename.lastIndexOf('.'));
           compiler = platform.find('compile','input',type)[0];
           if (!compiler) compiler = defaultCompiler;
-        
+
           if (startAt)
           {
            if (filename == startAt)
              startAt = '';
            else
-           {           
+           {
              //objFiles.push(filename.replace(/\.\w*$/,compiler.get('output')));
              objFiles.push(escapeIntermediate(filename,compiler))
              continue;
            }
           }
-          
+
           var file = compileFile(cmds,compiler,target,platform,mode,groups[i],files[j],run);
           if (file) objFiles.push(file);
-        }             
+        }
       }
      }
-  } 
+  }
   return objFiles;
 }
 
@@ -399,19 +399,19 @@ function doLink(cmds,objFiles,target,platform,mode)
   //link step
 
   var linker = platform.find('link','mode',mode)[0];
-  if (!linker) linker = platform.find('link')[0];  
+  if (!linker) linker = platform.find('link')[0];
   var cmd = fixPath(linker.get('path'),platform,mode);
   var params = linker.get('parameters');
-  var infiles = ''; 
+  var infiles = '';
   var rfiles = '';
-  for (var i in objFiles) 
-   { 
+  for (var i in objFiles)
+   {
      if (objFiles[i].indexOf('.o') > 0) infiles += findFile(target,linker,objFiles[i])+' ';
      else rfiles += findFile(target,linker,objFiles[i]) + ' ';
     }
   var options = [getAttribute('options',target)];
   options = options.concat(getProperty('options',globalDefines,linker,platform,mode));
-  
+
   //<link parameters="$options, C0X32 $input,$output,$mapfile,IMPORT32 CW32MT,$deffile " >
   //<target platform=win32 output="jsdb.exe" mapfile="jsdb.map" deffile="jsdb.def" intermediate="obj\">
 
@@ -422,39 +422,39 @@ function doLink(cmds,objFiles,target,platform,mode)
   {
       libraries = templateize(templates[0].cdata,libraries).join(' ')
   }
-  
+
   params = params.replace(/\$input/g,infiles);
   params = params.replace(/\$resource/g,rfiles);
   params = params.replace(/\$output/g,target.get('output'));
   params = params.replace(/\$mapfile/g,target.get('mapfile'));
   params = params.replace(/\$deffile/g,target.get('deffile'));
   params = params.replace(/\$libraries/g,libraries);
-  params = params.replace(/\$options/g,options.join(' '));  
+  params = params.replace(/\$options/g,options.join(' '));
   params = params.replace(/\$intermediate/g,target.get('intermediate'));
-  
+
   if (doBuild)
-  { 
+  {
     writeln(target.get('output'));
-    if (!runCommand(cmd + ' ' + params,cmds)) 
+    if (!runCommand(cmd + ' ' + params,cmds))
       throw(target.get('output')+'\r\n'+cmd+' '+params);
   }
   else
   {
-    cmds.writeln(cmd + ' ' + params); 
+    cmds.writeln(cmd + ' ' + params);
   }
 }
 
 function runMake(project,platform)
-{ 
+{
  var targetNames = [];
- var mode = null; 
+ var mode = null;
  var filters = [];
- 
+
  var msg = ''
  var error = null
 
  while (system.arguments.length)
- { 
+ {
    var p = system.arguments.shift()
    if (p.toLowerCase() == '/preview')
      doBuild = false;
@@ -473,20 +473,20 @@ function runMake(project,platform)
      x.close()
      configure = false;
    }
-   else if (p == '/define') 
+   else if (p == '/define')
    {
-    globalDefines = system.arguments.shift() + ';'
+    globalDefines.push(system.arguments.shift());
    }
-   else if (p[0] == '/') 
+   else if (p[0] == '/')
    {
     var x = project.find('mode','name',p.substr(1));
     if (!mode && x.length)
       mode = x[0];
    }
-   else 
+   else
    {
     var x = project.find('target','name',p);
-    if (x.length) 
+    if (x.length)
     {
      targetNames.push(p);
      msg += "Targeting " + p;
@@ -497,21 +497,21 @@ function runMake(project,platform)
      msg += "Compiling *" + p + "* ";
     }
    }
-   // else other flags     
+   // else other flags
  }
 
  if (doBuild) writeln(msg)
  if (!mode) mode = project.find('mode')[0];
- 
+
  var targets = project.find('target');
 
  if (doBuild) writeln('Building ',project.get('name'),' for ',platform.get('name'));
- 
- var commands = new Stream; 
- 
+
+ var commands = new Stream;
+
  if (debug) writeln(1)
  // run global and platform-dependent configure scripts
- 
+
  if (configure && !linkOnly && filters.length == 0)
  {
   doConfigure(commands,platform.find('configure'),null,mode);
@@ -525,10 +525,10 @@ function runMake(project,platform)
    if (targetNames.length && targetNames.indexOf(targets[i].get('name')) == -1) continue;
    if (!targetNames.length && targets[i].get('automatic') == '0') continue;
 
-   if (objMatches(targets[i],platform,mode)) 
+   if (objMatches(targets[i],platform,mode))
    {
-     if (doBuild) 
-     { 
+     if (doBuild)
+     {
        writeln('Target: ',targets[i].get('name'))
        writeln('Platform: ',platform.get('name'))
        writeln('Output: ',targets[i].get('output'))
@@ -544,11 +544,11 @@ function runMake(project,platform)
       doLink(commands,objs,targets[i],platform,mode);
      }
    }
-  } 
- } catch(err) 
+  }
+ } catch(err)
  {
   error = (err).toString()
-  writeln("Error in ", err); 
+  writeln("Error in ", err);
  }
 
  // run platform-dependent configure scripts if linking (no compile filters)
@@ -580,7 +580,7 @@ else
  load('xml.js')
 
  var projectName = system.arguments.shift()
- if (projectName.indexOf(".project") == -1 && system.exists(projectName+ '.project')) 
+ if (projectName.indexOf(".project") == -1 && system.exists(projectName+ '.project'))
      projectName += ".project"
 
  logFile = projectName.replace(".project",".makelog")
@@ -592,27 +592,27 @@ else
 
  if (system.arguments.length)
    platformName = system.arguments.shift()
-   
+
  if (platformName)
  {
    var platform = project.find('platform','name',platformName)[0];
-   if (platform) 
+   if (platform)
      runMake(project,platform)
    else
      writeln("Unknown platform: ",platform)
  }
  else
  {
-  writeln(help) 
+  writeln(help)
 
   writeln("Platforms")
   var l = project.find('platform');
   for (var i in l) writeln(" ",l[i].get('name'));
-  
+
   writeln("Modes")
   var l = project.find('mode');
   for (var i in l) writeln(" ",l[i].get('name'));
-  
+
   writeln("Targets")
   var l = project.find('target');
   for (var i in l) writeln(" ",l[i].get('name'),": ",l[i].get('output')," (",l[i].get('platform'),")");
